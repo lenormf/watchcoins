@@ -4,7 +4,7 @@
 ## improved by lenormf
 ##
 
-MULTIPOOL_USER="1KotnoAdpv8GGmqGcA6TmtM7S5M16HGqio"
+MULTIPOOL_USER=""
 MARKET_CACHE=$(mktemp)
 
 function fatal {
@@ -42,7 +42,7 @@ function table_row {
 function get_multipool_info {
 	local multipool_addr="http://www.middlecoin.com/allusers.html"
 
-	curl -s "$multipool_addr" | grep -A 6 "id=\"${MULTIPOOL_USER}" | sed -r "s/(<[^>]+>)|\s//g"
+	curl -s "$multipool_addr" | grep -A 6 "id=\"${MULTIPOOL_USER}" | sed -r "s/><\/td>/>0.0<\/td>/g" | sed -r "s/(<[^>]+>)|\s//g"
 }
 
 function display_user_stats {
