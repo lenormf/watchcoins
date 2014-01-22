@@ -4,13 +4,21 @@
 ## improved by lenormf
 ##
 
+## Example address
+## Change it with your own !
 MULTIPOOL_USER="15qKhTL1X6HoZEPGFn2FgUe5Xbska7FRxv"
+
+## Do not modify anything below this line unless you know what you're doing
 MARKET_CACHE=$(mktemp)
 
+# underline
 u=$(tput smul)
 u_=$(tput rmul)
+# red
 r=$(tput setaf 1)
+# green
 g=$(tput setaf 2)
+# color reset
 nc=$(tput sgr0)
 
 function fatal {
@@ -49,6 +57,7 @@ function table_row {
 	for i in "$@"; do
 		test $n -lt ${#fmt[@]} -a ${#fmt[@]} -gt 0 && lw="${fmt[$n]}"
 
+		# Modify to allow format modifiers
 		[[ "${lw:0:1}" =~ [urg] ]] && {
 			lf="${lw:0:1}";
 			lw="${lw:1}";
