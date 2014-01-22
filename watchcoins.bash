@@ -9,6 +9,9 @@ MARKET_CACHE=$(mktemp)
 
 u=$(tput smul)
 u_=$(tput rmul)
+r=$(tput setaf 1)
+g=$(tput setaf 2)
+nc=$(tput sgr0)
 
 function fatal {
 	echo "$@" && exit 1
@@ -22,12 +25,16 @@ function print_fmt {
 	local fmt="$1"
 
 	shift
-	if [ "$fmt" = u ]; then
+	if [ -z "$fmt" ]; then
+		echo -n "$@"
+	elif [ "$fmt" = u ]; then
 		echo -ne "$u"
 		echo -n "$@"
 		echo -ne "$u_"
 	else
+		eval echo -ne "\$${fmt}"
 		echo -n "$@"
+		echo -ne "$nc"
 	fi
 }
 
@@ -42,7 +49,7 @@ function table_row {
 	for i in "$@"; do
 		test $n -lt ${#fmt[@]} -a ${#fmt[@]} -gt 0 && lw="${fmt[$n]}"
 
-		[[ "${lw:0:1}" =~ [u] ]] && {
+		[[ "${lw:0:1}" =~ [urg] ]] && {
 			lf="${lw:0:1}";
 			lw="${lw:1}";
 		} || {
@@ -140,7 +147,7 @@ function display_currency_stats {
 
 	table_fmt=22:u15:u15:u15:u12
 	table_row "$table_fmt" "" "Market Cap" "Exchange Rate" "Maximum Supply" "Volume 24h" "Change 24h"
-	table_fmt=22:15:15:15:12
+	test "${change_last_24_percent:0:1}" = - && table_fmt=22:15:15:15:12:r12 || table_fmt=22:15:15:15:12:g12
 	table_row "$table_fmt" "${name}" "${market_cap_dollars}" "${exchange_rate_dollars}" "${maximum_supply_coins}" "${volume_last_24_percent}" "${change_last_24_percent}"
 }
 
