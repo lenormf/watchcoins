@@ -1,5 +1,7 @@
 # watchcoins
 
+Fillin the `MULTIPOOL_USER` variable in the script with your multipool username (on middlecoin, your bitcoin address), and just start the script without any argument.
+
 ## Description
 
 Fetch informations about a given address on a multipool (middlecoin for instance), and display several equivalent balances in USD, Bitcoin and StableCoin.
