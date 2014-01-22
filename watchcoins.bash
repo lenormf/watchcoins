@@ -40,9 +40,10 @@ function table_row {
 }
 
 function get_multipool_info {
+	local multipool_user="$1"
 	local multipool_addr="http://www.middlecoin.com/allusers.html"
 
-	curl -s "$multipool_addr" | grep -A 6 "id=\"${MULTIPOOL_USER}" | sed -r "s/><\/td>/>0.0<\/td>/g" | sed -r "s/(<[^>]+>)|\s//g"
+	curl -s "$multipool_addr" | grep -A 6 "id=\"${multipool_user}" | sed -r "s/[^a]><\//>0.0<\//g" | sed -r "s/(<[^>]+>)|\s//g"
 }
 
 function display_user_stats {
@@ -67,7 +68,7 @@ function display_user_stats {
 	local balance_sum_usd=$(calc "$balance_sum_btc * $rate_bitcoin_dollars")
 	local paid_out_usd=$(calc "$paid_out_btc * $rate_bitcoin_dollars")
 
-	local immature_unexchanged_balance_sbc=$(calc "$immature_unexchanged_balance_usd / $rate_stablecoin_dollars")
+	local immature_unexchanged_balance_sbc=$(calc $immature_unexchanged_balance_usd / $rate_stablecoin_dollars)
 	local unexchanged_balance_sbc=$(calc $unexchanged_balance_usd / $rate_stablecoin_dollars)
 	local balance_sbc=$(calc $balance_usd / $rate_stablecoin_dollars)
 	local balance_sum_sbc=$(calc $balance_sum_usd / $rate_stablecoin_dollars)
@@ -116,7 +117,7 @@ function display_currency_stats {
 }
 
 function main {
-	local multipool_info=( $(get_multipool_info) )
+	local multipool_info=( $(get_multipool_info "${MULTIPOOL_USER}") )
 	local bitcoin_info=( $(get_currency_stats Bitcoin) )
 	local stablecoin_info=( $(get_currency_stats StableCoin) )
 
