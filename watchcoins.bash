@@ -7,6 +7,9 @@
 MULTIPOOL_USER=""
 MARKET_CACHE=$(mktemp)
 
+u=$(tput smul)
+u_=$(tput rmul)
+
 function fatal {
 	echo "$@" && exit 1
 }
@@ -15,22 +18,43 @@ function calc {
 	echo "$@" | bc
 }
 
+function print_fmt {
+	local fmt="$1"
+
+	shift
+	if [ "$fmt" = u ]; then
+		echo -ne "$u"
+		echo -n "$@"
+		echo -ne "$u_"
+	else
+		echo -n "$@"
+	fi
+}
+
 function table_row {
 	local fmt=( ${1//:/ } )
 	local sep="|"
 
 	shift
 	local lw=5
+	local lf=""
 	local n=0
 	for i in "$@"; do
 		test $n -lt ${#fmt[@]} -a ${#fmt[@]} -gt 0 && lw="${fmt[$n]}"
 
+		[[ "${lw:0:1}" =~ [u] ]] && {
+			lf="${lw:0:1}";
+			lw="${lw:1}";
+		} || {
+			test $n -lt ${#fmt[@]} -a ${#fmt[@]} -gt 0 && lf="";
+		}
+
 		test "$n" -gt 0 -a "$n" -lt $# && echo -n " $sep "
 		if [ "${#i}" -ge "$lw" ]; then
-			echo -ne "${i:0:$lw}"
+			print_fmt "$lf" "${i:0:$lw}"
 		else
 			printf "%$((lw - ${#i}))s" " "
-			echo -ne "$i"
+			print_fmt "$lf" "$i"
 		fi
 
 		n=$((n + 1))
@@ -78,12 +102,15 @@ function display_user_stats {
 	table_row "$table_fmt" "User" "$user"
 	echo
 
-	table_fmt=22:15:15:11
+	table_fmt=22:u15:u15
 	table_row "$table_fmt" "" "Accepted" "Rejected"
+	table_fmt=22:15:15
 	table_row "$table_fmt" "Hashrate" "${hashrate_accepted_mhs} Mh/s" "${hashrate_rejected_mhs} Mh/s"
 	echo
 
-	table_row "$table_fmt" "Balance type/Currency" "Bitcoin" "USD" "StableCoin"
+	table_fmt=22:u15:u15:u11
+	table_row "$table_fmt" "" "Bitcoin" "USD" "StableCoin"
+	table_fmt=22:15:15:11
 	table_row "$table_fmt" "Immature Unexchanged" "${immature_unexchanged_balance_btc} btc" "\$${immature_unexchanged_balance_usd}" "${immature_unexchanged_balance_sbc} sbc"
 	table_row "$table_fmt" "Unexchanged" "${unexchanged_balance_btc} btc" "\$${unexchanged_balance_usd}" "${unexchanged_balance_sbc} sbc"
 	table_row "$table_fmt" "Regular" "${balance_btc} btc" "\$${balance_usd}" "${balance_sbc} sbc"
@@ -111,8 +138,9 @@ function display_currency_stats {
 	local volume_last_24_percent="$5"
 	local change_last_24_percent="$6"
 
+	table_fmt=22:u15:u15:u15:u12
+	table_row "$table_fmt" "" "Market Cap" "Exchange Rate" "Maximum Supply" "Volume 24h" "Change 24h"
 	table_fmt=22:15:15:15:12
-	table_row "$table_fmt" "Currency Name" "Market Cap" "Exchange Rate" "Maximum Supply" "Volume 24h" "Change 24h"
 	table_row "$table_fmt" "${name}" "${market_cap_dollars}" "${exchange_rate_dollars}" "${maximum_supply_coins}" "${volume_last_24_percent}" "${change_last_24_percent}"
 }
 
