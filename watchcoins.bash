@@ -6,7 +6,7 @@
 
 ## Example address
 ## Change it with your own !
-MULTIPOOL_USER="15qKhTL1X6HoZEPGFn2FgUe5Xbska7FRxv"
+MULTIPOOL_USER="1KotnoAdpv8GGmqGcA6TmtM7S5M16HGqio"
 
 ## Do not modify anything below this line unless you know what you're doing
 MARKET_CACHE=$(mktemp)
@@ -26,7 +26,7 @@ function fatal {
 }
 
 function calc {
-	echo "$@" | bc
+	echo "$@" | bc | sed -r "s/^\.([0-9]+)/0\.\1/g"
 }
 
 function print_fmt {
