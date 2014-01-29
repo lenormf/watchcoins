@@ -114,8 +114,12 @@ function display_user_stats {
 	local balance_sum_sbc=$(calc $balance_sum_usd / $rate_stablecoin_dollars)
 	local paid_out_sbc=$(calc $paid_out_usd / $rate_stablecoin_dollars)
 
-	table_fmt=22:34
+	local reports_url="http://www.middlecoin.com/reports"
+
+	table_fmt=22:${#user}
 	table_row "$table_fmt" "User" "$user"
+	table_fmt=22:$((${#user} + ${#reports_url} + 6))
+	table_row "$table_fmt" "Report" "${reports_url}/${user}.html"
 	echo
 
 	table_fmt=22:u15:u15
@@ -155,7 +159,7 @@ function display_currency_stats {
 	local change_last_24_percent="$6"
 
 	table_fmt=22:u15:u15:u15:u12
-	table_row "$table_fmt" "" "Market Cap" "Exchange Rate" "Maximum Supply" "Volume 24h" "Change 24h"
+	table_row "$table_fmt" "" "Market Cap" "Exchange Rate" "Mined coins" "Volume 24h" "Change 24h"
 	test "${change_last_24_percent:0:1}" = - && table_fmt=22:15:15:15:12:r12 || table_fmt=22:15:15:15:12:g12
 	table_row "$table_fmt" "${name}" "${market_cap_dollars}" "${exchange_rate_dollars}" "${maximum_supply_coins}" "${volume_last_24_percent}" "${change_last_24_percent}"
 }
