@@ -6,7 +6,7 @@
 
 ## Example address
 ## Change it with your own !
-MULTIPOOL_USER="1KotnoAdpv8GGmqGcA6TmtM7S5M16HGqio"
+MULTIPOOL_USER="1AjuhbDqeM4xTbNwnKbSRSoeuaDUHQw3jE"
 
 ## Do not modify anything below this line unless you know what you're doing
 MARKET_CACHE=$(mktemp)
@@ -136,7 +136,6 @@ function display_user_stats {
 	table_row "$table_fmt" "Regular" "${balance_btc} btc" "\$${balance_usd}" "${balance_sbc} sbc"
 	table_row "$table_fmt" "Unexchanged + Regular" "${balance_sum_btc} btc" "\$${balance_sum_usd}" "${balance_sum_sbc} sbc"
 	table_row "$table_fmt" "Paid out" "${paid_out_btc} btc" "\$${paid_out_usd}" "${paid_out_sbc} sbc"
-	echo
 }
 
 function get_currency_stats {
@@ -165,19 +164,38 @@ function display_currency_stats {
 }
 
 function main {
+	local coin_info=(
+		FedoraCoin
+		Anoncoin
+	)
+
 	local multipool_info=( $(get_multipool_info "${MULTIPOOL_USER}") )
 	local bitcoin_info=( $(get_currency_stats Bitcoin) )
 	local stablecoin_info=( $(get_currency_stats StableCoin) )
 
-	test 0 -eq "${#multipool_info[@]}" && fatal "Unable to get info from the multipool"
-	test 0 -eq "${#bitcoin_info[@]}" && fatal "Unable to get info from the market (bitcoin)"
-	test 0 -eq "${#stablecoin_info[@]}" && fatal "Unable to get info from the market (stablecoin)"
+	test 0 -eq "${#multipool_info[@]}" || {
+		display_user_stats "${multipool_info[@]}" "${bitcoin_info[@]}" "${stablecoin_info[@]}";
+		echo;
+	}
 
-	display_user_stats "${multipool_info[@]}" "${bitcoin_info[@]}" "${stablecoin_info[@]}"
-	display_currency_stats "${bitcoin_info[@]}"
-	echo
+	test 0 -eq "${#bitcoin_info[@]}" || {
+		display_currency_stats "${bitcoin_info[@]}";
+		echo;
+	}
 
-	display_currency_stats "${stablecoin_info[@]}"
+	test 0 -eq "${#stablecoin_info[@]}" || {
+		display_currency_stats "${stablecoin_info[@]}";
+		echo;
+	}
+
+	for i in "${coin_info[@]}"; do
+		local info=( $(get_currency_stats "$i") )
+
+		test 0 -eq "${#info[@]}" || {
+			display_currency_stats "${info[@]}";
+			echo;
+		}
+	done
 
 	rm -f "$MARKET_CACHE"
 }
