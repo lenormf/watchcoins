@@ -157,9 +157,9 @@ function display_currency_stats {
 	local volume_last_24_percent="$5"
 	local change_last_24_percent="$6"
 
-	table_fmt=22:u15:u15:u15:u12
+	table_fmt=22:u15:u15:u20:u12
 	table_row "$table_fmt" "" "Market Cap" "Exchange Rate" "Mined coins" "Volume 24h" "Change 24h"
-	test "${change_last_24_percent:0:1}" = - && table_fmt=22:15:15:15:12:r12 || table_fmt=22:15:15:15:12:g12
+	test "${change_last_24_percent:0:1}" = - && table_fmt=22:15:15:20:12:r12 || table_fmt=22:15:15:20:12:g12
 	table_row "$table_fmt" "${name}" "${market_cap_dollars}" "${exchange_rate_dollars}" "${maximum_supply_coins}" "${volume_last_24_percent}" "${change_last_24_percent}"
 }
 
